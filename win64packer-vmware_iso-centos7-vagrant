@@ -1,0 +1,35 @@
+{
+  "variables": {
+    "ssh_name": "packer",
+    "ssh_pass": "admin123"
+  },
+  "builders": [{
+     "type": "vmware-iso",
+     "iso_url": "D:\/ISOs\/CentOS-7.iso",
+	 "iso_checksum_type" : "md5",
+	 "iso_checksum" : "713ea7847adcdd1700e92429f212721a",
+     "disk_size" : 30720,
+     "fusion_app_path" : "C:\/Program Files (x86)\/VMware\/VMware Workstation",
+     "output_directory" : "C:\/Packer_OutputDir\/Vagrant-CentOS7",
+     "ssh_username" : "{{user `ssh_name`}}",
+     "ssh_password" : "{{user `ssh_pass`}}",
+     "ssh_wait_timeout" : "30m",
+	 "shutdown_command" : "sudo shutdown -P now",
+	 "vmx_data": {
+        "memsize": "4096",
+        "numvcpus": "2"
+		}
+  }],
+  "provisioners": [{
+    "type": "shell",
+    "inline": [
+      "sleep 30",
+      "echo Hello! Packer",
+	  "sudo touch /aaa.txt",
+	  "echo CreateCompleted"
+    ]
+  }],
+  "post-processors": [{
+    "type" : "vagrant"
+  }]  
+}
