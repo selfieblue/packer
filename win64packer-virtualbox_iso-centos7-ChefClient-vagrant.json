@@ -1,0 +1,57 @@
+{
+  "variables": {
+    "ssh_name": "packer",
+    "ssh_pass": "admin123"
+  },
+  "builders": [{
+     "type": "virtualbox-iso",
+     "iso_url": "D:\/ISOs\/CentOS-7.iso",
+	 "iso_checksum_type" : "md5",
+	 "iso_checksum" : "713ea7847adcdd1700e92429f212721a",
+	 "hard_drive_interface": "sata",
+     "disk_size" : 61440,
+     "output_directory" : "C:\/Users\/jzadmin\/VirtualBox VMs\/VM-VirtualBox-CentOS7-ChefClient",
+     "ssh_username" : "{{user `ssh_name`}}",
+     "ssh_password" : "{{user `ssh_pass`}}",
+     "ssh_wait_timeout" : "30m",
+	 "shutdown_command" : "sudo shutdown -P now",
+	 "vm_name" : "VM-VirtualBox-CentOS7-ChefClient",
+	 "vboxmanage": [
+           ["modifyvm", "{{.Name}}", "--memory", "4096"],
+           ["modifyvm", "{{.Name}}", "--cpus", "2"],
+		   ["modifyvm", "{{.Name}}", "--vram", "12"],
+		   ["modifyvm", "{{.Name}}", "--acpi", "on"],
+		   ["modifyvm", "{{.Name}}", "--ioapic", "on"],
+		   ["modifyvm", "{{.Name}}", "--pae", "off"],
+		   ["modifyvm", "{{.Name}}", "--longmode", "on"],
+		   ["modifyvm", "{{.Name}}", "--mouse", "usbtablet"],
+		   ["modifyvm", "{{.Name}}", "--rtcuseutc", "on"]
+     ]
+  }],
+  "provisioners": [{
+    "type": "shell",
+	"inline": [
+      "sleep 30",
+      "mkdir /home/packer/chef-repo",
+	  "echo Make Directory Completed",
+	  "sleep 5",
+	  "curl -o /home/packer/chef-repo/<client-keyfile>.pem <hosting website url>",
+	  "echo Download Chef Key1 Completed",
+	  "sleep 5",
+	  "curl -o /home/packer/chef-repo/<validator-keyfile>.pem <hosting website url>",
+      "echo Download Chef Key2 Completed",
+	  "ls -la /home/packer/chef-repo"
+    ]
+  },{
+    "type": "chef-client",
+    "server_url": "Chef-Server-URL",
+    "node_name"	: "packer-centos7-node1",
+	"chef_environment" : "dev",
+	"client_key" : "/home/packer/chef-repo/<client-keyfile>.pem",
+	"validation_client_name": "cheflab1-selfieblue-validator",
+	"validation_key_path": "/home/packer/chef-repo/<validator-keyfile>.pem"
+  }],
+  "post-processors": [{
+    "type" : "vagrant"
+  }]  
+}
