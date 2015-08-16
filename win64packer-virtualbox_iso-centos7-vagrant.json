@@ -1,0 +1,43 @@
+{
+  "variables": {
+    "ssh_name": "packer",
+    "ssh_pass": "admin123"
+  },
+  "builders": [{
+     "type": "virtualbox-iso",
+     "iso_url": "D:\/ISOs\/CentOS-7.iso",
+	 "iso_checksum_type" : "md5",
+	 "iso_checksum" : "713ea7847adcdd1700e92429f212721a",
+	 "hard_drive_interface": "sata",
+     "disk_size" : 30720,
+     "output_directory" : "C:\/Users\/jzadmin\/VirtualBox VMs\/VM-VirtualBox-CentOS7",
+     "ssh_username" : "{{user `ssh_name`}}",
+     "ssh_password" : "{{user `ssh_pass`}}",
+     "ssh_wait_timeout" : "30m",
+	 "shutdown_command" : "sudo shutdown -P now",
+	 "vm_name" : "VM-VirtualBox-CentOS7",
+	 "vboxmanage": [
+           ["modifyvm", "{{.Name}}", "--memory", "4096"],
+           ["modifyvm", "{{.Name}}", "--cpus", "2"],
+		   ["modifyvm", "{{.Name}}", "--vram", "12"],
+		   ["modifyvm", "{{.Name}}", "--acpi", "on"],
+		   ["modifyvm", "{{.Name}}", "--ioapic", "on"],
+		   ["modifyvm", "{{.Name}}", "--pae", "off"],
+		   ["modifyvm", "{{.Name}}", "--longmode", "on"],
+		   ["modifyvm", "{{.Name}}", "--mouse", "usbtablet"],
+		   ["modifyvm", "{{.Name}}", "--rtcuseutc", "on"]
+     ]
+  }],
+  "provisioners": [{
+    "type": "shell",
+    "inline": [
+      "sleep 30",
+      "echo Hello! Packer",
+	  "sudo touch /aaa.txt",
+	  "echo CreateCompleted"
+    ]
+  }],
+  "post-processors": [{
+    "type" : "vagrant"
+  }]  
+}
